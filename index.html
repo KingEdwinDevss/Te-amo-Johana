@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Mi Niña Johana</title>
+    <style>
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            background-color: #020208;
+            font-family: 'Montserrat', 'Segoe UI', sans-serif;
+            transition: background-color 0.8s ease; 
+        }
+        #canvas-container {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 3; 
+            pointer-events: none; 
+        }
+        canvas { display: block; }
+
+        /* --- VIDEO DE FONDO CORREGIDO --- */
+        .bg-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1; 
+            pointer-events: none;
+            opacity: 0.65; 
+            transition: opacity 1.2s ease; 
+        }
+
+        /* --- FONDO ANIMADO MODO DÍA --- */
+        .bg-dia-animado {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.5s ease;
+            background: radial-gradient(circle at center, #fff0f5 0%, #ffe4e1 50%, #ffb6c1 100%);
+            background-size: 200% 200%;
+            animation: moverFondoDia 15s ease infinite alternate;
+        }
+
+        @keyframes moverFondoDia {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 100%; }
+        }
+
+        /* --- PANTALLA DE BIENVENIDA ROMÁNTICA --- */
+        .bienvenida-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #050515 0%, #0d021a 100%);
+            z-index: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), background 0.8s ease;
+        }
+        .bienvenida-content {
+            width: 90%;
+            max-width: 360px;
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(15, 10, 30, 0.6);
+            border: 1px solid rgba(255, 0, 127, 0.3);
+            border-radius: 24px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 0 40px rgba(255, 0, 127, 0.15);
+            animation: entradaSuave 1s ease-out;
+            transition: all 0.8s ease;
+        }
+        .bienvenida-titulo {
+            color: #ffffff;
+            font-size: calc(1.4rem + 0.5vw);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(255, 0, 127, 0.6);
+            transition: all 0.8s ease;
+        }
+        .bienvenida-frase {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            font-style: italic;
+            transition: color 0.8s ease;
+        }
+        .bienvenida-input-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .bienvenida-input {
+            width: 100%;
+            padding: 14px 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 123, 0, 0.4);
+            border-radius: 50px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s ease, background 0.8s ease, color 0.8s ease;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        .bienvenida-input:focus {
+            border-color: #ff007f;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4), inset 0 0 5px rgba(0,0,0,0.3);
+        }
+        .btn-bienvenida {
+            background: linear-gradient(45deg, #ff007f, #ff7b00);
+            color: #ffffff;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.4);
+            transition: all 0.3s ease;
+        }
+        .btn-bienvenida:active {
+            transform: scale(0.97);
+        }
+
+        /* --- EFECTO TRANSICIÓN CORAZÓN --- */
+        .heart-transition {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 1px; height: 1px;
+            background: #ff007f;
+            clip-path: path("M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z");
+            transform-origin: center;
+            z-index: 999;
+            pointer-events: none;
+        }
+        .heart-transition.animar {
+            animation: expansionCorazon 1.4s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+        }
+
+        @keyframes entradaSuave {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes expansionCorazon {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; width: 40px; height: 40px; }
+            50% { opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(100); opacity: 0; width: 40px; height: 40px; }
+        }
+
+        /* Contenedores (Añadido transición de opacidad) */
+        .contenedor-central {
+            position: absolute;
+            top: 50%; 
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            width: 90%;
+            max-width: 340px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: auto;
+            animation: latidoContenedor 1.2s infinite; 
+            transition: opacity 0.5s ease;
+        }
+        
+        /* ESTILOS DE LA TERCERA PÁGINA */
+        .tercera-pagina {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+            pointer-events: auto;
+        }
+        #textoVerso {
+            transition: opacity 0.4s ease;
+        }
+
+        /* Texto fluido, corrido y centrado de forma natural - Borde elegante aplicado */
+        .frase-texto {
+            margin: 0; padding: 0;
+            color: #ffffff;
+            font-size: calc(0.95rem + 0.4vw); 
+            line-height: 1.5;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.1px;
+            text-align: center; 
+            min-height: 90px;
+            transition: all 0.8s ease;
+            
+            /* Borde fino y elegante mediante sombras múltiples */
+            text-shadow: 
+                -1px -1px 0 #000,  
+                 1px -1px 0 #000,
+                -1px  1px 0 #000,
+                 1px  1px 0 #000,
+                 0px  0px 100px rgba(255, 0, 127, 0.6); 
+        }
+
+        /* Contenedor de Botones en fila */
+        .botones-grupo {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+            margin-bottom: 20px; 
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Estilo base para ambos botones */
+        .btn-control {
+            background: rgba(255, 0, 127, 0.08); 
+            border: 2px solid rgba(255, 123, 0, 0.5); 
+            color: rgba(255, 123, 0, 0.9);
+            padding: 10px 16px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 50px;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            transition: all 0.3s ease, color 0.8s ease, background 0.8s ease;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.2);
+            text-shadow: 0 0 5px rgba(255, 123, 0, 0.4);
+            line-height: 1.2;
+            flex: 1; 
+            max-width: 130px;
+        }
+        .btn-control:hover {
+            background: rgba(255, 0, 127, 0.15);
+            border-color: rgba(255, 123, 0, 0.9);
+            color: #ffffff;
+            box-shadow: 0 0 25px rgba(255, 123, 0, 0.6);
+            text-shadow: 0 0 8px rgba(255, 123, 0, 0.9);
+        }
+        .btn-control:active {
+            transform: scale(0.96);
+        }
+
+        /* Imagen PNG integrada al flujo con borde animado elegante */
+        .imagen-inferior {
+            display: block;
+            width: 45%;
+            max-width: 130px; 
+            height: auto;
+            object-fit: contain;
+            pointer-events: none; 
+            margin-top: 5px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 0, 127, 0.6);
+            animation: brilloBorde 2s linear infinite alternate;
+            transition: border-color 0.8s ease;
+        }
+
+        @keyframes latidoContenedor {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            30% { transform: translate(-50%, -50%) scale(1.03); }
+            60% { transform: translate(-50%, -50%) scale(0.98); }
+        }
+
+        @keyframes brilloBorde {
+            0% {
+                box-shadow: 0 0 8px rgba(255, 0, 127, 0.5), inset 0 0 4px rgba(255, 0, 127, 0.3);
+                border-color: rgba(255, 0, 127, 0.6);
+            }
+            100% {
+                box-shadow: 0 0 20px rgba(255, 123, 0, 0.8), inset 0 0 8px rgba(255, 123, 0, 0.4);
+                border-color: rgba(255, 123, 0, 0.9);
+            }
+        }
+
+        /* --- BOTÓN SORPRESA FLOTANTE --- */
+        .btn-sorpresa {
+            position: absolute;
+            top: -45px;
+            background: linear-gradient(45deg, #ff007f, #ff7b00);
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            border-radius: 50px;
+            cursor: pointer;
+            z-index: 20;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.8);
+            letter-spacing: 1px;
+            display: none;
+            animation: brincoSorpresa 0.6s ease-out infinite alternate;
+            transition: transform 0.2s ease;
+        }
+        .btn-sorpresa:pointer-events { auto; }
+        .btn-sorpresa:active { transform: scale(0.9); }
+
+        @keyframes brincoSorpresa {
+            0% { transform: translateY(0); box-shadow: 0 0 15px rgba(255, 0, 127, 0.7); }
+            100% { transform: translateY(-6px); box-shadow: 0 0 25px rgba(255, 123, 0, 0.9); }
+        }
+
+        /* --- VENTANA MODAL CON BORDE ANIMADO ELEGANTE --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(2, 2, 8, 0.85);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease, background 0.8s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: rgba(15, 15, 30, 0.95);
+            border: 2px solid #ff007f;
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.4);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 320px;
+            padding: 25px;
+            text-align: center;
+            transform: scale(0.8);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.8s ease;
+            animation: brilloModal 3s linear infinite alternate;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        @keyframes brilloModal {
+            0% {
+                border-color: #ff007f;
+                box-shadow: 0 0 22px rgba(255, 0, 127, 0.5), inset 0 0 10px rgba(255, 0, 127, 0.2);
+            }
+            100% {
+                border-color: #ff7b00;
+                box-shadow: 0 0 35px rgba(255, 123, 0, 0.7), inset 0 0 15px rgba(255, 123, 0, 0.3);
+            }
+        }
+
+        .modal-titulo {
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
+            transition: all 0.8s ease;
+        }
+        .modal-textarea {
+            width: 100%;
+            height: 110px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 123, 0, 0.5);
+            border-radius: 12px;
+            color: #ffffff;
+            padding: 12px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: none;
+            outline: none;
+            transition: border-color 0.3s, background 0.8s ease, color 0.8s ease;
+        }
+        .modal-textarea:focus {
+            border-color: #ff007f;
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.2);
+        }
+        .modal-botones {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .btn-modal {
+            flex: 1;
+            padding: 10px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 50px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease, background 0.8s ease;
+        }
+        .btn-cancelar {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ccc;
+        }
+        .btn-enviar {
+            background: #ff007f;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+        }
+        .btn-enviar:hover {
+            background: #ff2a93;
+            box-shadow: 0 0 20px rgba(255, 0, 127, 0.6);
+        }
+
+        /* --- VENTANA DE AVISO CYBERPUNK --- */
+        .aviso-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(2, 2, 8, 0.7);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 600; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, background 0.8s ease;
+        }
+        .aviso-overlay.mostrar {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .aviso-neon {
+            background: rgba(10, 10, 20, 0.98);
+            border: 2px solid #ff007f;
+            color: #ffffff;
+            padding: 22px 25px;
+            border-radius: 18px;
+            width: 85%;
+            max-width: 290px;
+            text-align: center;
+            transform: scale(0.8);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.8s ease;
+            box-shadow: 0 0 25px rgba(255, 0, 127, 0.5);
+            animation: brilloAlertaFlotante 2s linear infinite alternate;
+        }
+        .aviso-overlay.mostrar .aviso-neon {
+            transform: scale(1);
+        }
+        .aviso-texto {
+            font-size: 0.95rem;
+            font-weight: 600;
+            line-height: 1.4;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+            transition: color 0.8s ease;
+        }
+        .btn-aviso-ok {
+            background: linear-gradient(45deg, #ff007f, #ff7b00);
+            color: #ffffff;
+            border: none;
+            padding: 8px 25px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
+            transition: transform 0.2s;
+        }
+        .btn-aviso-ok:active {
+            transform: scale(0.95);
+        }
+        @keyframes brilloAlertaFlotante {
+            0% { border-color: #ff007f; box-shadow: 0 0 20px rgba(255, 0, 127, 0.5); }
+            100% { border-color: #ff7b00; box-shadow: 0 0 25px rgba(255, 123, 0, 0.6); }
+        }
+
+        /* ========================================================
+           SISTEMA MODO DÍA Y MODO NOCHE MEJORADO
+           ======================================================== */
+           
+        /* Botón Flotante Toggle */
+        .btn-modo-toggle {
+            position: fixed; bottom: 25px; right: 25px; z-index: 1000;
+            width: 50px; height: 50px; border-radius: 50%; border: none;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            color: white; font-size: 1.5rem; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-modo-toggle:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(255, 117, 140, 0.6); }
+        .btn-modo-toggle:active { transform: scale(0.9); }
+
+        /* Capa de Cielo Nocturno Animado */
+        .cielo-nocturno {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 1.5s ease;
+            background: radial-gradient(ellipse at bottom, #0d021a 0%, #020208 100%);
+            overflow: hidden;
+        }
+        .estrellas-capa1, .estrellas-capa2 {
+            position: absolute; width: 200%; height: 200%; top: -50%; left: -50%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: rotarEstrellas 100s linear infinite;
+            opacity: 0.8;
+        }
+        .estrellas-capa2 {
+            background-size: 300px 300px;
+            animation: rotarEstrellas 150s linear infinite reverse;
+            opacity: 0.4;
+        }
+        @keyframes rotarEstrellas {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- ESTILOS MODO NOCHE (Activo cuando body tiene .modo-noche) --- */
+        body.modo-noche .bg-video { opacity: 0 !important; }
+        body.modo-noche .cielo-nocturno { opacity: 1; }
+        body.modo-noche .bg-dia-animado { opacity: 0 !important; }
+        body.modo-noche .btn-modo-toggle {
+            background: linear-gradient(135deg, #2b1055, #7597de);
+            box-shadow: 0 4px 15px rgba(117, 151, 222, 0.4);
+        }
+
+        /* --- ESTILOS MODO DÍA (Activo cuando body tiene .modo-dia) --- */
+        body.modo-dia { background-color: #fff0f5; }
+        body.modo-dia .cielo-nocturno { opacity: 0; }
+        body.modo-dia .bg-video { opacity: 0.65 !important; } 
+        body.modo-dia .bg-dia-animado { opacity: 1 !important; } 
+        
+        body.modo-dia .bienvenida-screen {
+            background: radial-gradient(circle at center, #fff0f5 0%, #ffc0cb 100%);
+        }
+        body.modo-dia .bienvenida-content {
+            background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255, 105, 135, 0.5); box-shadow: 0 0 35px rgba(255, 105, 135, 0.3);
+        }
+        body.modo-dia .bienvenida-titulo { color: #d81b60; text-shadow: 0 0 12px rgba(255, 105, 135, 0.4); }
+        body.modo-dia .bienvenida-frase { color: #5a3a45; font-weight: 500; }
+        body.modo-dia .bienvenida-input {
+            background: rgba(255, 255, 255, 0.95); border-color: rgba(255, 105, 135, 0.6); color: #d81b60; box-shadow: inset 0 0 8px rgba(255,105,135,0.15);
+        }
+        body.modo-dia .bienvenida-input:focus {
+            border-color: #ff007f; box-shadow: 0 0 15px rgba(255, 105, 135, 0.4), inset 0 0 5px rgba(255,105,135,0.2);
+        }
+        body.modo-dia .btn-bienvenida { background: linear-gradient(45deg, #ff4d6d, #ff758c); box-shadow: 0 0 20px rgba(255, 77, 109, 0.5); }
+        body.modo-dia .btn-bienvenida:hover { transform: scale(1.02); box-shadow: 0 0 25px rgba(255, 77, 109, 0.7); }
+        
+        /* Frases de la segunda y tercera página en modo día */
+        body.modo-dia .frase-texto {
+            color: #ffffff; 
+            text-shadow: 
+                -1px -1px 0 #d81b60,  1px -1px 0 #d81b60,
+                -1px  1px 0 #d81b60,  1px  1px 0 #d81b60,
+                 0px  0px 25px rgba(255, 77, 109, 0.9),
+                 0px  0px 45px rgba(255, 143, 163, 0.6); 
+            font-weight: 700;
+        }
+
+        /* --- MEJORA: Borde negro para la tercera pantalla en Modo Día --- */
+        body.modo-dia #textoVerso {
+            text-shadow: 
+                -1.5px -1.5px 0 #000000,  
+                 1.5px -1.5px 0 #000000,
+                -1.5px  1.5px 0 #000000,  
+                 1.5px  1.5px 0 #000000,
+                 0px  0px 15px rgba(0,0,0,0.4) !important;
+        }
+        
+        body.modo-dia .btn-control {
+            background: rgba(255, 255, 255, 0.7); border-color: rgba(255, 77, 109, 0.7); color: #d81b60;
+            text-shadow: 0 0 3px rgba(255, 255, 255, 0.9); box-shadow: 0 0 15px rgba(255, 77, 109, 0.3);
+        }
+        body.modo-dia .btn-control:hover { background: rgba(255, 77, 109, 0.25); border-color: #ff4d6d; color: #d81b60; box-shadow: 0 0 25px rgba(255, 77, 109, 0.5); }
+        
+        body.modo-dia .imagen-inferior {
+            border-color: rgba(255, 77, 109, 0.7); animation: brilloBordeDia 2s linear infinite alternate;
+        }
+        @keyframes brilloBordeDia {
+            0% { box-shadow: 0 0 10px rgba(255, 77, 109, 0.5), inset 0 0 5px rgba(255, 77, 109, 0.3); border-color: rgba(255, 77, 109, 0.7); }
+            100% { box-shadow: 0 0 25px rgba(255, 143, 163, 0.8), inset 0 0 12px rgba(255, 143, 163, 0.5); border-color: #ff4d6d; }
+        }
+        
+        body.modo-dia .modal-overlay { background: rgba(255, 240, 245, 0.9); }
+        body.modo-dia .modal-content {
+            background: rgba(255, 255, 255, 0.98); border-color: #ff4d6d; box-shadow: 0 0 40px rgba(255, 77, 109, 0.4); animation: brilloModalDia 3s linear infinite alternate;
+        }
+        @keyframes brilloModalDia {
+            0% { border-color: #ff4d6d; box-shadow: 0 0 25px rgba(255, 77, 109, 0.5), inset 0 0 12px rgba(255, 77, 109, 0.2); }
+            100% { border-color: #ff758f; box-shadow: 0 0 40px rgba(255, 143, 163, 0.7), inset 0 0 20px rgba(255, 143, 163, 0.4); }
+        }
+        body.modo-dia .modal-titulo { color: #d81b60; text-shadow: 0 0 8px rgba(255, 77, 109, 0.4); }
+        body.modo-dia .modal-textarea { background: rgba(255, 240, 245, 0.6); border-color: rgba(255, 77, 109, 0.6); color: #5a3a45; }
+        body.modo-dia .modal-textarea:focus { border-color: #ff007f; box-shadow: 0 0 15px rgba(255, 77, 109, 0.4); }
+        body.modo-dia .btn-cancelar { background: rgba(0, 0, 0, 0.08); color: #5a3a45; }
+        body.modo-dia .aviso-overlay { background: rgba(255, 240, 245, 0.8); }
+        body.modo-dia .aviso-neon {
+            background: rgba(255, 255, 255, 0.98); border-color: #ff4d6d; color: #5a3a45; box-shadow: 0 0 30px rgba(255, 77, 109, 0.5); animation: brilloAlertaDia 2s linear infinite alternate;
+        }
+        @keyframes brilloAlertaDia {
+            0% { border-color: #ff4d6d; box-shadow: 0 0 25px rgba(255, 77, 109, 0.5); }
+            100% { border-color: #ff758f; box-shadow: 0 0 35px rgba(255, 143, 163, 0.7); }
+        }
+
+        /* ========================================================
+           REPRODUCTOR DE MÚSICA & BARRA PROGRESO
+           ======================================================== */
+        .btn-music-toggle {
+            position: fixed; bottom: 25px; left: 25px; z-index: 1000;
+            width: 50px; height: 50px; border-radius: 50%; border: none;
+            background: linear-gradient(135deg, #ff007f 0%, #ff7b00 100%);
+            color: white; font-size: 1.5rem; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 0 15px rgba(255, 0, 127, 0.6);
+            animation: latidoMusica 2s infinite alternate;
+            transition: all 0.4s ease;
+        }
+        .btn-music-toggle:hover { transform: scale(1.1); box-shadow: 0 0 25px rgba(255, 123, 0, 0.8); }
+        .btn-music-toggle:active { transform: scale(0.9); }
+
+        @keyframes latidoMusica {
+            0% { box-shadow: 0 0 10px rgba(255, 0, 127, 0.5); transform: scale(1); }
+            100% { box-shadow: 0 0 25px rgba(255, 123, 0, 0.8); transform: scale(1.05); }
+        }
+
+        .music-player-overlay {
+            position: fixed; bottom: 85px; left: 25px; z-index: 999;
+            width: 300px; max-width: 80vw;
+            opacity: 0; pointer-events: none;
+            transform: translateY(20px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .music-player-overlay.active {
+            opacity: 1; pointer-events: auto; transform: translateY(0);
+        }
+
+        .music-player-content {
+            background: rgba(15, 10, 30, 0.85);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 0, 127, 0.6);
+            border-radius: 20px; padding: 20px;
+            box-shadow: 0 0 30px rgba(255, 0, 127, 0.3);
+            display: flex; flex-direction: column; gap: 15px;
+            animation: brilloReproductor 3s linear infinite alternate;
+        }
+
+        @keyframes brilloReproductor {
+            0% { border-color: rgba(255, 0, 127, 0.6); box-shadow: 0 0 20px rgba(255, 0, 127, 0.3); }
+            100% { border-color: rgba(255, 123, 0, 0.8); box-shadow: 0 0 30px rgba(255, 123, 0, 0.5); }
+        }
+
+        body.modo-dia .music-player-content {
+            background: rgba(255, 255, 255, 0.95); border-color: #ff4d6d;
+            box-shadow: 0 0 35px rgba(255, 77, 109, 0.4);
+        }
+        body.modo-dia .btn-music-toggle { background: linear-gradient(135deg, #ff4d6d, #ff758c); box-shadow: 0 0 20px rgba(255, 77, 109, 0.6); }
+        body.modo-dia .music-title, body.modo-dia .music-now-playing { color: #d81b60; text-shadow: none; }
+        body.modo-dia .playlist-item { color: #d81b60; border-color: rgba(255, 77, 109, 0.3); }
+        body.modo-dia .playlist-item:hover, body.modo-dia .playlist-item.active { background: rgba(255, 77, 109, 0.15); border-color: #ff4d6d; }
+
+        .music-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .music-title { color: #fff; font-size: 1rem; font-weight: 700; text-transform: uppercase; text-shadow: 0 0 10px rgba(255, 0, 127, 0.5); }
+        .btn-close-music { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; transition: color 0.3s; padding: 0; }
+        body.modo-dia .btn-close-music { color: #d81b60; }
+        .btn-close-music:hover { color: #ff007f; }
+
+        .music-now-playing {
+            text-align: center; color: #fff; font-size: 0.9rem; font-weight: 600;
+            min-height: 25px; display: flex; align-items: center; justify-content: center;
+            text-shadow: 0 0 5px rgba(255, 123, 0, 0.5);
+            margin-bottom: -5px;
+        }
+
+        /* --- ESTILOS BARRA DE PROGRESO --- */
+        .music-progress-container {
+            display: flex; align-items: center; gap: 10px; width: 100%;
+        }
+        .music-time {
+            color: #fff; font-size: 0.75rem; font-weight: 600;
+            text-shadow: 0 0 5px rgba(255, 0, 127, 0.5);
+            min-width: 35px; text-align: center;
+        }
+        .music-progress-bar {
+            flex: 1; -webkit-appearance: none; appearance: none;
+            height: 6px; background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px; outline: none; cursor: pointer;
+            transition: background 0.1s linear;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+        }
+        .music-progress-bar::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 14px; height: 14px; border-radius: 50%;
+            background: #ff007f; cursor: pointer;
+            box-shadow: 0 0 10px #ff007f, 0 0 5px #ff7b00;
+            transition: transform 0.2s ease;
+        }
+        .music-progress-bar::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+        body.modo-dia .music-time { color: #d81b60; text-shadow: none; }
+        body.modo-dia .music-progress-bar { background: rgba(255, 77, 109, 0.2); }
+        body.modo-dia .music-progress-bar::-webkit-slider-thumb {
+            background: #ff4d6d; box-shadow: 0 0 12px #ff4d6d;
+        }
+
+        .music-controls { display: flex; justify-content: center; gap: 15px; align-items: center; }
+        .btn-control-music {
+            background: rgba(255, 0, 127, 0.2); border: 1px solid rgba(255, 123, 0, 0.5);
+            color: #fff; width: 40px; height: 40px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; cursor: pointer;
+            transition: all 0.3s; font-size: 1rem;
+        }
+        .btn-control-music:hover { background: rgba(255, 0, 127, 0.5); box-shadow: 0 0 15px rgba(255, 123, 0, 0.5); transform: scale(1.1); }
+        .btn-control-music:active { transform: scale(0.95); }
+        .btn-control-music.play-btn { width: 50px; height: 50px; font-size: 1.2rem; background: linear-gradient(45deg, #ff007f, #ff7b00); border: none; }
+        
+        body.modo-dia .btn-control-music { color: #d81b60; border-color: #ff4d6d; background: rgba(255, 77, 109, 0.1); }
+        body.modo-dia .btn-control-music.play-btn { color: white; background: linear-gradient(45deg, #ff4d6d, #ff758c); box-shadow: 0 0 15px rgba(255, 77, 109, 0.5); }
+
+        .music-volume { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; }
+        .volume-slider { flex: 1; accent-color: #ff007f; cursor: pointer; }
+        body.modo-dia .volume-slider { accent-color: #ff4d6d; }
+
+        .playlist-container {
+            max-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 5px;
+            padding-right: 5px; margin-top: 5px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;
+        }
+        .playlist-container::-webkit-scrollbar { width: 5px; }
+        .playlist-container::-webkit-scrollbar-thumb { background: rgba(255, 0, 127, 0.5); border-radius: 5px; }
+        body.modo-dia .playlist-container::-webkit-scrollbar-thumb { background: rgba(255, 77, 109, 0.5); }
+        .playlist-item {
+            background: transparent; border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ddd; padding: 8px 10px; border-radius: 8px; font-size: 0.8rem;
+            cursor: pointer; transition: all 0.3s; text-align: left;
+        }
+        .playlist-item:hover, .playlist-item.active {
+            background: rgba(255, 0, 127, 0.2); color: #fff; border-color: rgba(255, 0, 127, 0.5);
+        }
+
+        /* --- ANIMACIÓN LLUVIA DE CORAZONES (NUEVA) --- */
+        .corazon-flotante-lluvia {
+            position: fixed;
+            pointer-events: none;
+            z-index: 2000;
+            font-size: 2rem;
+            animation: flotarHaciaArriba ease-in forwards;
+        }
+
+        @keyframes flotarHaciaArriba {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="bgDiaAnimado" class="bg-dia-animado"></div>
+
+    <div id="cieloNocturno" class="cielo-nocturno">
+        <div class="estrellas-capa1"></div>
+        <div class="estrellas-capa2"></div>
+    </div>
+
+    <div id="bienvenidaScreen" class="bienvenida-screen">
+        <div class="bienvenida-content">
+            <div class="bienvenida-titulo">❤️Bienvenida❤️</div>
+            <div class="bienvenida-frase">"En este universo virtual, cada palabra fue pensada para iluminar tu camino mi amor..."</div>
+            <div class="bienvenida-input-wrapper">
+                <input type="text" id="passInput" class="bienvenida-input" placeholder="Escribe aquí Tu Nombre..." autocomplete="off">
+            </div>
+            <button id="btnVerificar" class="btn-bienvenida">💞Entrar💞</button>
+        </div>
+    </div>
+
+    <div id="heartTransition" class="heart-transition"></div>
+
+    <video class="bg-video" autoplay loop muted playsinline>
+        <source src="video.mp4" type="video/mp4">
+    </video>
+
+    <div id="canvas-container">
+        <canvas id="universeCanvas"></canvas>
+    </div>
+
+    <div id="avisoOverlay" class="aviso-overlay">
+        <div class="aviso-neon">
+            <div id="avisoTexto" class="aviso-texto"></div>
+            <button id="btnAvisoOk" class="btn-aviso-ok">Aceptar</button>
+        </div>
+    </div>
+
+    <div id="paginaDos" class="contenedor-central">
+        <button id="btnSorpresa" class="btn-sorpresa">💖Aplasta Aquí Para Dedícarme Algo Amor🥺💖</button>
+
+        <div id="textoFrase" class="frase-texto"></div>
+        
+        <div class="botones-grupo">
+            <button id="btnAnterior" class="btn-control">Frase<br>Anterior</button>
+            <button id="btnSiguiente" class="btn-control">Siguiente<br>Frase</button>
+        </div>
+
+        <img src="1000444436.png" alt="Decoración Johana" class="imagen-inferior">
+
+        <button id="btnIrTercera" class="btn-control" style="margin-top: 20px; flex: none; width: 100%; max-width: 280px;">❤️Descubrir Más❤️</button>
+    </div>
+
+    <div id="terceraPagina" class="tercera-pagina" style="display: none; opacity: 0;">
+        <div class="modal-content" style="pointer-events: auto; width: 90%; max-width: 360px; display: flex; flex-direction: column; align-items: center; gap: 15px; position: relative;">
+            
+            <button id="btnSorpresa3" class="btn-sorpresa">💖Aplasta Aquí Para Dedícarme Algo Amor🥺💖</button>
+
+            <div class="modal-titulo">Para mi Johana ❤️</div>
+            <div id="textoVerso" class="frase-texto" style="min-height: 120px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; text-transform: none; letter-spacing: 0.5px;"></div>
+            <div class="botones-grupo" style="width: 100%;">
+                <button id="btnPrevVerso" class="btn-control">Anterior</button>
+                <button id="btnNextVerso" class="btn-control">Siguiente</button>
+            </div>
+            <button id="btnVolverPagina2" class="btn-control" style="width: 100%; background: transparent; border: 1px solid rgba(255, 255, 255, 0.2);">Volver</button>
+        </div>
+    </div>
+
+    <div id="modalDiscord" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-titulo">Escribe lo que sientes... ✨</div>
+            <textarea id="txtMensaje" class="modal-textarea" placeholder="Escribe tu mensaje aquí para mí..."></textarea>
+            <div class="modal-botones">
+                <button id="btnCerrarModal" class="btn-modal btn-cancelar">Cerrar</button>
+                <button id="btnEnviarDiscord" class="btn-modal btn-enviar">Enviar Mensaje</button>
+            </div>
+        </div>
+    </div>
+
+    <button id="btnModoToggle" class="btn-modo-toggle" title="Cambiar Tema">🌙</button>
+
+    <button id="btnMusicToggle" class="btn-music-toggle" title="Reproductor de Música">🎵</button>
+    <div id="musicPlayerOverlay" class="music-player-overlay">
+        <div class="music-player-content">
+            <div class="music-header">
+                <div class="music-title">Músicas Para Ti✨</div>
+                <button id="btnCerrarMusic" class="btn-close-music">✖</button>
+            </div>
+            <div id="musicNowPlaying" class="music-now-playing">Elige una canción...</div>
+            
+            <div class="music-progress-container">
+                <span id="musicCurrentTime" class="music-time">00:00</span>
+                <input type="range" id="musicProgressBar" class="music-progress-bar" value="0" min="0" step="1">
+                <span id="musicTotalTime" class="music-time">00:00</span>
+            </div>
+
+            <div class="music-controls">
+                <button id="btnMusicPrev" class="btn-control-music">⏮</button>
+                <button id="btnMusicPlayPause" class="btn-control-music play-btn">▶</button>
+                <button id="btnMusicNext" class="btn-control-music">⏭</button>
+            </div>
+            <div class="music-volume">
+                <span>🔉</span>
+                <input type="range" id="musicVolume" class="volume-slider" min="0" max="1" step="0.05" value="0.5">
+                <span>🔊</span>
+            </div>
+            <div id="playlistContainer" class="playlist-container">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONTROL ANTI-ATRÁS ---
+        window.history.pushState(null, null, window.location.href);
+        window.addEventListener('popstate', function () {
+            window.history.pushState(null, null, window.location.href);
+        });
+
+        // --- 1. CONFIGURACIÓN DEL CANVAS Y DEL UNIVERSO ---
+        const canvas = document.getElementById('universeCanvas');
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        let stars = [];
+        let heartParticles = [];
+        let clickHearts = []; 
+        const word = "Johana";
+        const starCount = 130; 
+        const heartParticleCount = width < 600 ? 500 : 800; 
+
+        function getHeartPoint(t) {
+            return {
+                x: 16 * Math.pow(Math.sin(t), 3),
+                y: -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t))
+            };
+        }
+
+        class Star {
+            constructor() {
+                this.x = Math.random() * width; this.y = Math.random() * height;
+                this.size = Math.random() * 2; this.alpha = Math.random();
+                this.speed = 0.005 + Math.random() * 0.01;
+            }
+            update() { this.alpha += this.speed; if (this.alpha > 1 || this.alpha < 0) this.speed = -this.speed; }
+            draw() { ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`; ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); }
+        }
+
+        class HeartParticle {
+            constructor(targetX, targetY, char, innerFactor) {
+                this.x = Math.random() * width; this.y = Math.random() * height;
+                this.targetX = targetX; this.targetY = targetY; this.char = char;
+                this.speed = 0.018 + Math.random() * 0.025;
+                this.size = innerFactor < 0.8 ? (Math.floor(Math.random() * 4) + 10) : (Math.floor(Math.random() * 6) + 14); 
+                this.color = Math.random() > 0.4 ? '#ff007f' : '#ff7b00';
+                this.alpha = innerFactor < 0.6 ? (0.15 + Math.random() * 0.25) : (0.45 + Math.random() * 0.5);
+            }
+            update(scale) {
+                this.x += (width / 2 + this.targetX * scale - this.x) * this.speed;
+                this.y += (height / 2 - 25 + this.targetY * scale - this.y) * this.speed;
+            }
+            draw() { ctx.fillStyle = this.color; ctx.globalAlpha = this.alpha; ctx.font = `bold ${this.size}px 'Montserrat', sans-serif`; ctx.fillText(this.char, this.x, this.y); }
+        }
+
+        class ExplosionHeart {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.size = Math.random() * 8 + 10;
+                const angle = Math.random() * Math.PI * 2;
+                const speedValue = Math.random() * 4 + 2;
+                this.speedX = Math.cos(angle) * speedValue;
+                this.speedY = Math.sin(angle) * speedValue;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.015 + 0.015;
+                this.color = Math.random() > 0.5 ? '#ff007f' : '#ff7b00';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.speedY += 0.04; 
+                this.alpha -= this.decay;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.font = `bold ${this.size}px 'Montserrat', sans-serif`;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fillText("♥", this.x, this.y);
+                ctx.restore();
+            }
+        }
+
+        function initCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            stars = []; for (let i = 0; i < starCount; i++) stars.push(new Star());
+            heartParticles = [];
+            const heartScaleFactor = Math.min(width, height) / 25;
+            for (let i = 0; i < heartParticleCount; i++) {
+                let t = (i / heartParticleCount) * Math.PI * 2;
+                let point = getHeartPoint(t);
+                let char = word[i % word.length];
+                let innerFactor = Math.random(); 
+                let offsetX = point.x * heartScaleFactor * innerFactor + (Math.random() - 0.5) * 10;
+                let offsetY = point.y * heartScaleFactor * innerFactor + (Math.random() - 0.5) * 10;
+                heartParticles.push(new HeartParticle(offsetX, offsetY, char, innerFactor));
+            }
+        }
+
+        let loopCount = 0;
+        function animateCanvas() {
+            ctx.clearRect(0, 0, width, height);
+            ctx.globalAlpha = 1;
+            stars.forEach(s => { s.update(); s.draw(); });
+            loopCount += 0.065;
+            let currentScale = 1 + (Math.sin(loopCount) * Math.cos(loopCount * 0.5) > 0 ? 0.11 : 0.035);
+            heartParticles.forEach(p => { p.update(currentScale); p.draw(); });
+            
+            for (let i = clickHearts.length - 1; i >= 0; i--) {
+                clickHearts[i].update();
+                if (clickHearts[i].alpha <= 0) {
+                    clickHearts.splice(i, 1);
+                } else {
+                    clickHearts[i].draw();
+                }
+            }
+            
+            requestAnimationFrame(animateCanvas);
+        }
+
+        function crearChispasCorazon(x, y) {
+            for (let i = 0; i < 25; i++) {
+                clickHearts.push(new ExplosionHeart(x, y));
+            }
+        }
+
+        window.addEventListener('click', (e) => {
+            if(e.target.closest('.botones-grupo') || e.target.closest('#btnSorpresa') || e.target.closest('#btnSorpresa3') || e.target.closest('.modal-content') || e.target.closest('.aviso-neon') || e.target.closest('.bienvenida-content') || e.target.closest('#btnModoToggle') || e.target.closest('#btnMusicToggle') || e.target.closest('.music-player-overlay') || e.target.closest('#btnIrTercera')) return;
+            crearChispasCorazon(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('resize', initCanvas);
+        initCanvas(); animateCanvas();
+
+
+        // ========================================================
+        // NUEVA FUNCIÓN: LLUVIA DE CORAZONES PREVIA AL CAMBIO DE FRASE
+        // ========================================================
+        function lluviaDeCorazones(callback) {
+            const numCorazones = 20; 
+            const coloresNoche = ['#ff007f', '#ff7b00', '#ff2a93'];
+            const coloresDia = ['#ff4d6d', '#ff7eb3', '#d81b60'];
+            const bodyEsDia = document.body.classList.contains('modo-dia');
+
+            for (let i = 0; i < numCorazones; i++) {
+                setTimeout(() => {
+                    const corazon = document.createElement('div');
+                    corazon.className = 'corazon-flotante-lluvia';
+                    corazon.innerText = '♥';
+                    
+                    const posX = Math.random() * window.innerWidth;
+                    corazon.style.left = `${posX}px`;
+                    
+                    const colorArr = bodyEsDia ? coloresDia : coloresNoche;
+                    corazon.style.color = colorArr[Math.floor(Math.random() * colorArr.length)];
+                    corazon.style.textShadow = `0 0 10px ${corazon.style.color}`;
+                    
+                    const duracion = Math.random() * 1 + 1.5; 
+                    corazon.style.animationDuration = `${duracion}s`;
+
+                    document.body.appendChild(corazon);
+
+                    setTimeout(() => {
+                        corazon.remove();
+                    }, duracion * 1000);
+                }, i * 40); 
+            }
+
+            // Ejecuta el cambio real de frase luego de la animación
+            setTimeout(() => {
+                if (callback) callback();
+            }, 600);
+        }
+
+
+        // --- 2. CONFIGURACIÓN INTELIGENTE DE FRASES ---
+        const textoFrase = document.getElementById('textoFrase');
+        const btnSiguiente = document.getElementById('btnSiguiente');
+        const btnAnterior = document.getElementById('btnAnterior');
+
+        const btnSorpresa = document.getElementById('btnSorpresa');
+        const modalDiscord = document.getElementById('modalDiscord');
+        const btnCerrarModal = document.getElementById('btnCerrarModal');
+        const btnEnviarDiscord = document.getElementById('btnEnviarDiscord');
+        const txtMensaje = document.getElementById('txtMensaje');
+        
+        const avisoOverlay = document.getElementById('avisoOverlay');
+        const avisoTexto = document.getElementById('avisoTexto');
+        const btnAvisoOk = document.getElementById('btnAvisoOk');
+
+        const bienvenidaScreen = document.getElementById('bienvenidaScreen');
+        const passInput = document.getElementById('passInput');
+        const btnVerificar = document.getElementById('btnVerificar');
+        const heartTransition = document.getElementById('heartTransition');
+
+        let clicksAvanzar = 0; 
+
+        const frasesJohana = [
+            "Desde que te conocí, mis días tienen un motivo más para sonreír.",
+            "Tu sonrisa tiene un efecto que ningún medicamento puede igualar.",
+            "No sé si eres un sueño, pero ojalá nunca despierte.",
+            "Hay personas bonitas, y luego estás tú, que juegas en otra liga.",
+            "Si pudiera pedir un deseo, sería conocerte un poquito más cada día.",
+            "Tu mirada tiene el poder de detener el tiempo.",
+            "No busco a alguien perfecto, solo a alguien como tú.",
+            "Contigo, hasta los días más simples se vuelven especiales.",
+            "Tienes esa forma de ser que hace imposible no admirarte.",
+            "Si la tuvieras un nombre, llevaría el tuyo.",
+            "Eres la casualidad más bonita que me ha regalado la vida.",
+            "Cada vez que hablas, haces que todo a mi alrededor pase a segundo plano.",
+            "Tu sonrisa ilumina más que el sol en un día despejado.",
+            "No sé qué tiene tu forma de ser, pero me encanta.",
+            "Eres la razón por la que mi corazón sonríe sin avisar.",
+            "Si tus ojos contaran historias, podría pasar horas escuchándolos.",
+            "No hace falta que hagas nada para llamar mi atención; simplemente siendo tú, ya lo logras.",
+            "Ojalá algún día pueda ser el motivo de esa hermosa sonrisa tuya.",
+            "Hay personas que dejan huellas, y tú ya dejaste una muy bonita en mi corazón.",
+            "Contigo aprendí que una simple conversación puede alegrar todo un día.",
+            "Tu belleza llama la atención, pero tu forma de ser enamora mucho más.",
+            "No sé qué nos depare el destino, pero me alegra que te haya puesto en mi camino.",
+            "Eres esa persona que hace que valga la pena ilusionarse.",
+            "Si me preguntas qué es lo más bonito de mi día, la respuesta siempre será hablar contigo.",
+            "No prometo ser perfecto, pero sí hacer todo lo posible por sacarte una sonrisa cada día."
+        ];
+
+        let indiceActual = 0;
+
+        function mostrarAlertaNeon(texto) {
+            avisoTexto.innerHTML = texto;
+            avisoOverlay.classList.add('mostrar');
+        }
+
+        btnAvisoOk.addEventListener('click', (e) => {
+            crearChispasCorazon(e.clientX, e.clientY);
+            avisoOverlay.classList.remove('mostrar');
+        });
+
+        // --- LÓGICA DE VALIDACIÓN Y NOTIFICACIÓN A DISCORD ---
+        btnVerificar.addEventListener('click', (e) => {
+            crearChispasCorazon(e.clientX, e.clientY);
+            const valorInput = passInput.value.trim();
+
+            if (valorInput === "Johana") {
+                heartTransition.classList.add('animar');
+
+                const webhookUrl = "https://discord.com/api/webhooks/1574194202244419738/DbeSb2kDYsHPbYOoywMDz6sMTTTAk8f72CTQBjfy_gMfS4D42Tx8s-DAkGVnlAzt5P-7";
+                const logPayload = {
+                    username: "Sistema de Acceso",
+                    avatar_url: "https://i.imgur.com/wSTFkRM.png",
+                    embeds: [{
+                        title: "🌸 Johana ha ingresado al sitio 🌸",
+                        description: `El sistema valida que la persona correcta ha ingresado su contraseña de forma exitosa.`,
+                        color: 65280, 
+                        timestamp: new Date().toISOString()
+                    }]
+                };
+
+                fetch(webhookUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(logPayload)
+                }).catch(err => console.error("Error enviando log: ", err));
+
+                setTimeout(() => {
+                    bienvenidaScreen.style.opacity = "0";
+                    setTimeout(() => {
+                        bienvenidaScreen.style.display = "none";
+                    }, 800);
+                }, 600);
+
+            } else {
+                mostrarAlertaNeon("¡Código incorrecto! Inténtalo de nuevo con la contraseña correcta. ❤️");
+            }
+        });
+
+        passInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                btnVerificar.click();
+            }
+        });
+
+        function obtenerIndiceInicialInteligente() {
+            let vistas = JSON.parse(localStorage.getItem('frasesVistas')) || [];
+            if (vistas.length >= frasesJohana.length) { vistas = []; }
+            let disponibles = [];
+            for (let i = 0; i < frasesJohana.length; i++) {
+                if (!vistas.includes(i)) { disponibles.push(i); }
+            }
+            let indiceElegido = disponibles[Math.floor(Math.random() * disponibles.length)];
+            vistas.push(indiceElegido);
+            localStorage.setItem('frasesVistas', JSON.stringify(vistas));
+            return indiceElegido;
+        }
+
+        // Modificada para agregar transición suave
+        function actualizarFrase() {
+            textoFrase.style.opacity = 0;
+            setTimeout(() => {
+                textoFrase.innerHTML = frasesJohana[indiceActual];
+                textoFrase.style.opacity = 1;
+            }, 300);
+        }
+
+        function avanzarFrase() {
+            indiceActual++;
+            if (indiceActual >= frasesJohana.length) { indiceActual = 0; }
+            actualizarFrase();
+
+            clicksAvanzar++;
+            if (clicksAvanzar % 4 === 0) {
+                btnSorpresa.style.display = 'block';
+            }
+        }
+
+        function retrocederFrase() {
+            indiceActual--;
+            if (indiceActual < 0) { indiceActual = frasesJohana.length - 1; }
+            actualizarFrase();
+        }
+
+        btnSiguiente.addEventListener('click', (e) => {
+            crearChispasCorazon(e.clientX, e.clientY);
+            lluviaDeCorazones(avanzarFrase);
+        });
+
+        btnAnterior.addEventListener('click', (e) => {
+            crearChispasCorazon(e.clientX, e.clientY);
+            lluviaDeCorazones(retrocederFrase);
+        });
+
+        btnSorpresa.addEventListener('click', (e) => {
+            crearChispasCorazon(e.clientX, e.clientY);
+            modalDiscord.classList.add('active');
+        });
+
+        btnCerrarModal.addEventListener('click', (e) => {
+            crearChispasCorazon(e.clientX, e.clientY);
+            modalDiscord.classList.remove('active');
+        });
+
+        btnEnviarDiscord.addEventListener('click', (e) => {
+            crearChispasCorazon(e.clientX, e.clientY);
+            const mensaje = txtMensaje.value.trim();
+            if (mensaje === "") {
+                mostrarAlertaNeon("¡Escribe algo antes de enviar! ❤️");
+                return;
+            }
+
+            const webhookUrl = "https://discord.com/api/webhooks/1574194202244419738/DbeSb2kDYsHPbYOoywMDz6sMTTTAk8f72CTQBjfy_gMfS4D42Tx8s-DAkGVnlAzt5P-7";
+            
+            const payload = {
+                username: "Mensajito de Amor de Johana",
+                avatar_url: "https://i.imgur.com/wSTFkRM.png",
+                embeds: [{
+                    title: "✨Nueva Dedicatoria Recibida ✨",
+                    description: `**Mensaje:**\n"${mensaje}"`,
+                    color: 16711807, 
+                    footer: { text: "Enviado desde el Universo de Frases" },
+                    timestamp: new Date().toISOString()
+                }]
+            };
+
+            fetch(webhookUrl, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                mostrarAlertaNeon("Tu dedicatoria ha sido enviada con éxito 🥰");
+                txtMensaje.value = "";
+                modalDiscord.classList.remove('active');
+                btnSorpresa.style.display = 'none'; 
+                // MEJORA: Ocultamos también el botón clonado de la tercera pantalla
+                if (typeof btnSorpresa3 !== 'undefined') btnSorpresa3.style.display = 'none';
+            })
+            .catch(err => {
+                console.error(err);
+                mostrarAlertaNeon("Hubo un error al conectar con Discord.");
+            });
+        });
+
+        // Inicio
+        indiceActual = obtenerIndiceInicialInteligente();
+        textoFrase.innerHTML = frasesJohana[indiceActual];
+
+        // ========================================================
+        // TOGGLE MODO DÍA Y MODO NOCHE
+        // ========================================================
+        const btnModoToggle = document.getElementById('btnModoToggle');
+        let esModoDia = true; 
+
+        document.body.classList.add('modo-dia');
+
+        btnModoToggle.addEventListener('click', (e) => {
+            crearChispasCorazon(e.clientX, e.clientY); 
+            
+            if (esModoDia) {
+                document.body.classList.remove('modo-dia');
+                document.body.classList.add('modo-noche');
+                btnModoToggle.innerHTML = "☀️"; 
+            } else {
+                document.body.classList.remove('modo-noche');
+                document.body.classList.add('modo-dia');
+                btnModoToggle.innerHTML = "🌙"; 
+            }
+            esModoDia = !esModoDia;
+            setTimeout(actualizarColorBarraProgreso, 50); 
+        });
+
+        // ========================================================
+        // REPRODUCTOR DE MÚSICA & PROGRESO
+        // ========================================================
+        const btnMusicToggle = document.getElementById('btnMusicToggle');
+        const musicPlayerOverlay = document.getElementById('musicPlayerOverlay');
+        const btnCerrarMusic = document.getElementById('btnCerrarMusic');
+        const btnMusicPlayPause = document.getElementById('btnMusicPlayPause');
+        const btnMusicPrev = document.getElementById('btnMusicPrev');
+        const btnMusicNext = document.getElementById('btnMusicNext');
+        const musicVolume = document.getElementById('musicVolume');
+        const musicNowPlaying = document.getElementById('musicNowPlaying');
+        const playlistContainer = document.getElementById('playlistContainer');
+        
+        const musicProgressBar = document.getElementById('musicProgressBar');
+        const musicCurrentTime = document.getElementById('musicCurrentTime');
+        const musicTotalTime = document.getElementById('musicTotalTime');
+
+        const canciones = [
+            { nombre: "Tu Y Yo Por Siempre", archivo: "musica1.mp3" },
+            { nombre: "Te Amo💖", archivo: "musica2.mp3" },
+            { nombre: "Eres Tú", archivo: "musica3.mp3" },
+            { nombre: "Me Gusta Todo De Ti❤️", archivo: "musica4.mp3" }
+        ];
+
+        let reproductorAudio = new Audio();
+        let indiceCancionActual = 0;
+        let estaReproduciendo = false;
+        reproductorAudio.volume = 0.5;
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "00:00";
+            const min = Math.floor(seconds / 60);
+            const sec = Math.floor(seconds % 60);
+            return `${min < 10 ? '0' : ''}${min}:${sec < 10 ? '0' : ''}${sec}`;
+        }
+
+        function actualizarColorBarraProgreso() {
+            const porcentaje = (reproductorAudio.currentTime / reproductorAudio.duration) * 100 || 0;
+            const colorCargado = document.body.classList.contains('modo-dia') ? '#ff758c' : '#ff007f';
+            const colorFondo = document.body.classList.contains('modo-dia') ? 'rgba(255, 117, 140, 0.2)' : 'rgba(255, 255, 255, 0.2)';
+            musicProgressBar.style.background = `linear-gradient(to right, ${colorCargado} ${porcentaje}%, ${colorFondo} ${porcentaje}%)`;
+        }
+
+        reproductorAudio.addEventListener('loadedmetadata', () => {
+            musicProgressBar.max = reproductorAudio.duration;
+            musicTotalTime.innerText = formatTime(reproductorAudio.duration);
+        });
+
+        reproductorAudio.addEventListener('timeupdate', () => {
+            musicProgressBar.value = reproductorAudio.currentTime;
+            musicCurrentTime.innerText = formatTime(reproductorAudio.currentTime);
+            actualizarColorBarraProgreso();
+        });
+
+        musicProgressBar.addEventListener('input', () => {
+            reproductorAudio.currentTime = musicProgressBar.value;
+            actualizarColorBarraProgreso();
+        });
+
+        function cargarPlaylist() {
+            playlistContainer.innerHTML = '';
+            canciones.forEach((cancion, index) => {
+                const btnCancion = document.createElement('div');
+                btnCancion.className = 'playlist-item';
+                btnCancion.innerText = cancion.nombre;
+                btnCancion.onclick = (e) => {
+                    crearChispasCorazon(e.clientX, e.clientY);
+                    seleccionarCancion(index);
+                };
+                playlistContainer.appendChild(btnCancion);
+            });
+            actualizarUIPlaylist();
+        }
+
+        function actualizarUIPlaylist() {
+            const items = playlistContainer.querySelectorAll('.playlist-item');
+            items.forEach((item, index) => {
+                if (index === indiceCancionActual && reproductorAudio.src) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        function seleccionarCancion(index) {
+            indiceCancionActual = index;
+            reproductorAudio.src = canciones[indiceCancionActual].archivo;
+            musicNowPlaying.innerText = "🎶 " + canciones[indiceCancionActual].nombre;
+            reproducirMusica();
+        }
+
+        function reproducirMusica() {
+            if (!reproductorAudio.src || reproductorAudio.src.endsWith(window.location.href)) {
+                seleccionarCancion(0);
+                return;
+            }
+            reproductorAudio.play().catch(() => {
+                console.log("El navegador requiere interacción manual previa para reproducir audio.");
+            });
+            estaReproduciendo = true;
+            btnMusicPlayPause.innerText = "⏸";
+            actualizarUIPlaylist();
+        }
+
+        function pausarMusica() {
+            reproductorAudio.pause();
+            estaReproduciendo = false;
+            btnMusicPlayPause.innerText = "▶";
+        }
+
+        btnMusicToggle.addEventListener('click', (e) => {
+            crearChispasCorazon(e.clientX, e.clientY);
+            musicPlayerOverlay.classList.toggle('active');
+        });
+
+        btnCerrarMusic.addEventListener('click', (e) => {
+            crearChispasCorazon(e.clientX, e.clientY);
+            musicPlayerOverlay.classList.remove('active');
+        });
+
+        btnMusicPlayPause.addEventListener('click', (e) => {
+            crearChispasCorazon(e.clientX, e.clientY);
+            if (estaReproduciendo) {
+                pausarMusica();
+            } else {
+                reproducirMusica();
+            }
+        });
+
+        btnMusicNext.addEventListener('click', (e) => {
+            crearChispasCorazon(e.clientX, e.clientY);
+            indiceCancionActual++;
+            if (indiceCancionActual >= canciones.length) indiceCancionActual = 0;
+            seleccionarCancion(indiceCancionActual);
+        });
+
+        btnMusicPrev.addEventListener('click', (e) => {
+            crearChispasCorazon(e.clientX, e.clientY);
+            indiceCancionActual--;
+            if (indiceCancionActual < 0) indiceCancionActual = canciones.length - 1;
+            seleccionarCancion(indiceCancionActual);
+        });
+
+        musicVolume.addEventListener('input', (e) => {
+            reproductorAudio.volume = e.target.value;
+        });
+
+        reproductorAudio.addEventListener('ended', () => {
+            btnMusicNext.click();
+        });
+
+        cargarPlaylist();
+
+        // ========================================================
+        // TERCERA PÁGINA CON VERSOS ROMÁNTICOS
+        // ========================================================
+        const paginaDos = document.getElementById('paginaDos');
+        const terceraPagina = document.getElementById('terceraPagina');
+        const btnIrTercera = document.getElementById('btnIrTercera');
+        const btnVolverPagina2 = document.getElementById('btnVolverPagina2');
+        const textoVerso = document.getElementById('textoVerso');
+        const btnPrevVerso = document.getElementById('btnPrevVerso');
+        const btnNextVerso = document.getElementById('btnNextVerso');
+
+        // MEJORA: Constante y contador añadidos para el funcionamiento en la tercera pantalla
+        const btnSorpresa3 = document.getElementById('btnSorpresa3');
+        let clicksAvanzarVerso = 0;
+
+        // MEJORA: Event Listener para abrir el modal desde la tercera pantalla
+        if (btnSorpresa3) {
+            btnSorpresa3.addEventListener('click', (e) => {
+                crearChispasCorazon(e.clientX, e.clientY);
+                modalDiscord.classList.add('active');
+            });
+        }
+
+        const versosJohana = [
+            "Te amo no solo por cómo eres, sino por cómo soy yo cuando estoy contigo.",
+            "Si el mundo fuera un libro, tú serías la página más bonita que he leído.",
+            "Tantos siglos, tantos mundos, tanto espacio... y coincidir contigo es lo mejor que me ha pasado.",
+            "Mi lugar favorito en el mundo es dentro de tus abrazos.",
+            "Eres la razón por la que mi sonrisa brilla un poco más cada mañana.",
+            "Tus ojos son el mapa que guía mis pasos hacia la felicidad.",
+            "Eres el sueño del que nunca quiero despertar.",
+            "No importa el camino, si es contigo llegaré a donde sea.",
+            "Eres, sencillamente, lo mejor que me ha pasado.",
+            "Mi café favorito siempre será el de tus ojos.",
+            "Si la belleza fuera un instante, tú serías la eternidad.",
+            "No busco un final feliz, busco una historia infinita contigo.",
+            "Eres la casualidad más hermosa que llegó a mi vida.",
+            "Si me dieran a elegir de nuevo, te elegiría a ti mil veces más.",
+            "Tu sonrisa es mi sol en los días de lluvia.",
+            "Tengo un millón de planes y en todos estás tú.",
+            "Estar contigo es como estar en casa, no importa el lugar.",
+            "No necesito estrellas para guiarme, con tu luz me basta.",
+            "Eres mi pensamiento favorito antes de dormir.",
+            "Tu amor es el regalo que nunca pedí pero que siempre necesité.",
+            "Eres el verso que siempre quise escribir.",
+            "Tu risa es la melodía que calma mi alma.",
+            "Eres mi refugio seguro en este mundo caótico.",
+            "Lo mejor de mi día es cuando nuestras miradas se cruzan.",
+            "A tu lado, la vida tiene un brillo especial.",
+            "Tu mano encaja perfectamente en la mía.",
+            "No quiero el mundo entero, solo quiero tu mundo.",
+            "Eres mi presente más bonito y mi futuro más deseado.",
+            "A veces te miro y me pregunto qué hice para merecerte.",
+            "Eres la musa de todos mis suspiros.",
+            "Me enamoré de tu alma antes de tocar tu piel.",
+            "Contigo el invierno se siente como primavera.",
+            "Eres el latido que le da ritmo a mi corazón.",
+            "No hay nada más dulce que el sonido de tu voz.",
+            "Eres mi momento favorito del día.",
+            "Tus abrazos son mi lugar seguro.",
+            "Eres el brillo de mis ojos cuando hablo de ti.",
+            "Si el amor fuera un arte, tú serías mi obra maestra.",
+            "No te quiero para un rato, te quiero para toda la vida.",
+            "Eres la respuesta a todas mis oraciones.",
+            "Tu amor me hace una mejor persona cada día.",
+            "Eres mi principio, mi medio y mi fin.",
+            "No hay paisaje más bello que el de tu sonrisa.",
+            "Tú eres mi destino, sin importar el camino.",
+            "Estar a tu lado es lo único que necesito para ser feliz.",
+            "Eres la dueña de mi corazón y de mis pensamientos.",
+            "Tus ojos son el océano donde quiero naufragar.",
+            "Eres el aroma de mi felicidad.",
+            "No cambiaría un segundo contigo por cien años sin ti.",
+            "Eres la luz que disipa todas mis sombras.",
+            "Tú eres mi hoy y todos mis mañanas.",
+            "Eres el sueño que se hizo realidad.",
+            "Amarte es el viaje más hermoso de mi vida.",
+            "Eres mi mundo, mi cielo y mi todo.",
+            "Te amo más allá de las palabras y de los silencios."
+        ];
+
+        let indiceVerso = 0;
+
+        // Modificada para agregar transición suave
+        function actualizarVerso() {
+            textoVerso.style.opacity = 0;
+            setTimeout(() => {
+                textoVerso.innerHTML = versosJohana[indiceVerso];
+                textoVerso.style.opacity = 1;
+            }, 300);
+        }
+
+        btnIrTercera.addEventListener('click', (e) => {
+            crearChispasCorazon(e.clientX, e.clientY);
+            paginaDos.style.opacity = '0';
+            setTimeout(() => {
+                paginaDos.style.display = 'none';
+                terceraPagina.style.display = 'flex';
+                void terceraPagina.offsetWidth; 
+                terceraPagina.style.opacity = '1';
+                actualizarVerso();
+            }, 500);
+        });
+
+        btnVolverPagina2.addEventListener('click', (e) => {
+            crearChispasCorazon(e.clientX, e.clientY);
+            terceraPagina.style.opacity = '0';
+            setTimeout(() => {
+                terceraPagina.style.display = 'none';
+                paginaDos.style.display = 'flex';
+                void paginaDos.offsetWidth;
+                paginaDos.style.opacity = '1';
+            }, 500);
+        });
+
+        btnNextVerso.addEventListener('click', (e) => {
+            crearChispasCorazon(e.clientX, e.clientY);
+            lluviaDeCorazones(() => {
+                indiceVerso++;
+                if (indiceVerso >= versosJohana.length) indiceVerso = 0;
+                actualizarVerso();
+                
+                // MEJORA: Contador de la 3ra pantalla para mostrar el botón sorpresa
+                clicksAvanzarVerso++;
+                if (clicksAvanzarVerso % 4 === 0) {
+                    if(btnSorpresa3) btnSorpresa3.style.display = 'block';
+                }
+            });
+        });
+
+        btnPrevVerso.addEventListener('click', (e) => {
+            crearChispasCorazon(e.clientX, e.clientY);
+            lluviaDeCorazones(() => {
+                indiceVerso--;
+                if (indiceVerso < 0) indiceVerso = versosJohana.length - 1;
+                actualizarVerso();
+            });
+        });
+
+        // Inicio tercera página
+        textoVerso.innerHTML = versosJohana[indiceVerso];
+    </script>
+</body>
+</html>
